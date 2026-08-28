@@ -20,6 +20,15 @@ def create_access_token(data: dict) ->str:
     to_encode["exp"] = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
     return jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
-def store_refresh_token(email : str , refresh_token : str):
+def store_refresh_token(email: str, refresh_token: str):
     expiry_seconds = settings.refresh_token_expire_days * 24 * 60 * 60
     redis_client.setex(f"refresh_token:{refresh_token}", expiry_seconds, email)
+    redis_client.sadd(f"user_tokens:{email}", refresh_token)
+    redis_client.expire(f"user_tokens:{email}", expiry_seconds)
+
+
+def revoke_all_tokens(email: str):
+    tokens = redis_client.smembers(f"user_tokens:{email}")
+    for token in tokens:
+        redis_client.delete(f"refresh_token:{token}")
+    redis_client.delete(f"user_tokens:{email}")

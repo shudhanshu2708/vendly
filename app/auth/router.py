@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
+from app.auth.security import revoke_all_tokens
+from app.schemas.auth import ChangePasswordRequest
 from app.redis_client import redis_client
 from app.auth.security import hash_password, verify_password, create_access_token
 from app.auth.security import store_refresh_token, create_refresh_token
@@ -74,9 +76,16 @@ def me(current_user: User = Depends(get_current_user)):
 
 
 @router.post("/change-password")
-def change_password():
-    return {"changepassword": "okk"}
+def change_password(data: ChangePasswordRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not verify_password(data.old_password, current_user.password_hash):
+        raise HTTPException(status_code=401, detail="Old password is incorrect")
+
+    current_user.password_hash = hash_password(data.new_password)
+    db.commit()
+    return {"message": "Password updated successfully"}
+
 
 @router.post("/logout-all")
-def logout_all():
-    return {"all device log out": "okk"}
+def logout_all(current_user: User = Depends(get_current_user)):
+    revoke_all_tokens(current_user.email)
+    return {"message": "Logged out from all devices"}
