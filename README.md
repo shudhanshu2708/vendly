@@ -2,31 +2,29 @@
 
 Vendly is a full-stack e-commerce application built with **FastAPI, PostgreSQL, Redis, and React**.
 
-## Features
+## ✨ Features
 
-- JWT Authentication with Access & Refresh Tokens
+- JWT authentication with access and refresh tokens
 - Customer and Admin roles
-- Product and Category Management
-- Shopping Cart
-- Stock Management
-- Checkout and Orders
-- Admin Order Management
-- Order Status Updates
-- Redis-based Refresh Token Management
-- PostgreSQL Database
-- Alembic Database Migrations
-- Docker & Docker Compose
-- React Frontend
+- Product and category management
+- Shopping cart
+- Stock management
+- Checkout and orders
+- Admin order management and order status updates
+- Redis-based refresh token management
+- PostgreSQL database with Alembic migrations
+- Docker and Docker Compose support
+- React frontend
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-**Backend:** Python, FastAPI, SQLAlchemy, PostgreSQL, Redis, Alembic, JWT
+| Layer | Technologies |
+|-------|--------------|
+| **Backend** | Python, FastAPI, SQLAlchemy, PostgreSQL, Redis, Alembic, JWT |
+| **Frontend** | React, JavaScript, React Router, Vite, CSS |
+| **Tools** | Docker, Git, GitHub |
 
-**Frontend:** React, JavaScript, React Router, Vite, CSS
-
-**Tools:** Docker, Git, GitHub
-
-## Project Structure
+## 📁 Project Structure
 
 ```text
 Vendly/
@@ -47,7 +45,15 @@ Vendly/
 ├── requirements.txt
 ├── seed.py
 └── README.md
-## Setup
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- PostgreSQL and Redis (or Docker)
 
 ### Backend
 
@@ -55,12 +61,41 @@ Vendly/
 git clone https://github.com/shudhanshu2708/Vendly.git
 cd Vendly
 
+# Create and activate a virtual environment
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS / Linux
 
+# Install dependencies
 pip install -r requirements.txt
 
-## API Endpoints
+# Run database migrations
+alembic upgrade head
+
+# (Optional) Seed sample data
+python seed.py
+
+# Start the API server
+uvicorn app.main:app --reload
+```
+
+The API will be available at `http://localhost:8000`, with interactive docs at `http://localhost:8000/docs`.
+
+### Frontend
+
+```bash
+cd vendly-frontend
+npm install
+npm run dev
+```
+
+### Docker
+
+```bash
+docker compose up --build
+```
+
+## 📡 API Endpoints
 
 ### Authentication
 
@@ -71,14 +106,17 @@ POST /auth/refresh
 POST /auth/logout
 GET  /auth/me
 POST /auth/change-password
+```
 
 ### Products
-'''text
+
+```text
 GET    /products/
 GET    /products/{id}
 POST   /products/
 PUT    /products/{id}
 DELETE /products/{id}
+```
 
 ### Cart
 
@@ -88,6 +126,7 @@ POST   /cart/
 PUT    /cart/{item_id}
 DELETE /cart/{item_id}
 DELETE /cart/
+```
 
 ### Orders
 
@@ -97,35 +136,42 @@ GET  /orders/
 GET  /orders/{order_id}
 GET  /orders/admin/all
 PUT  /orders/admin/{order_id}/status
+```
 
+## 🔄 Order Flow
+
+```text
 Login → Browse Products → Add to Cart → Checkout
 → Stock Validation → Create Order → Decrease Stock → View Order
+```
 
-### Admin
+## 👤 Admin Capabilities
 
-```tex
-Admin can:
+Admins can:
+
 - Add products
 - Update products
 - Deactivate products
 - View customer orders
 - Update order status
 
-Future Improvements
-- Payment Gateway
-- Product Search & Filtering
-- Reviews & Ratings
-- Image Upload
-- Email Notifications
-- Pagination
-- Automated Tests
-- CI/CD
-- Cloud Deployment
+## 🔮 Future Improvements
 
-Author
-Sudhanshu Singh
-GitHub: https://github.com/shudhanshu2708/Vendly
+- [ ] Payment gateway
+- [ ] Product search and filtering
+- [ ] Reviews and ratings
+- [ ] Image upload
+- [ ] Email notifications
+- [ ] Pagination
+- [ ] Automated tests
+- [ ] CI/CD
+- [ ] Cloud deployment
 
-## License
+## 👨‍💻 Author
+
+**Sudhanshu Singh**
+GitHub: [@shudhanshu2708](https://github.com/shudhanshu2708)
+
+## 📄 License
 
 This project is licensed under the MIT License.
