@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: vendly_pass
       POSTGRES_DB: vendly
     ports:
-      - "5432:5432"
+      - "55433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

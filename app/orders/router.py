@@ -7,8 +7,7 @@ from app.models.product import Product
 from app.models.user import User
 from app.auth.dependencies import get_current_user, require_admin
 from app.schemas.order import OrderOut, OrderStatusUpdate
-from app.schemas.order import OrderOut
-from app.auth.dependencies import get_current_user
+
 
 router = APIRouter()
 
@@ -58,6 +57,10 @@ def checkout(db: Session = Depends(get_db), current_user: User = Depends(get_cur
 def list_orders(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return db.query(Order).filter(Order.user_id == current_user.id).all()
 
+@router.get("/admin/all", response_model=list[OrderOut])
+def list_all_orders(db: Session = Depends(get_db), _=Depends(require_admin)):
+    return db.query(Order).all()
+
 @router.get("/{order_id}", response_model=OrderOut)
 def get_order(order_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     order = db.query(Order).filter(Order.id == order_id, Order.user_id == current_user.id).first()
@@ -65,9 +68,7 @@ def get_order(order_id: int, db: Session = Depends(get_db), current_user: User =
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
-@router.get("/admin/all", response_model=list[OrderOut])
-def list_all_orders(db: Session = Depends(get_db), _=Depends(require_admin)):
-    return db.query(Order).all()
+
 
 @router.put("/admin/{order_id}/status", response_model=OrderOut)
 def update_order_status(order_id: int, data: OrderStatusUpdate, db: Session = Depends(get_db), _=Depends(require_admin)):
