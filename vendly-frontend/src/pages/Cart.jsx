@@ -6,7 +6,7 @@ function Cart() {
   const fetchCart = async () => {
     const token = localStorage.getItem("access_token");
 
-    const response = await fetch("https://vendly-yqrt.onrender.com/cart/", {
+    const response = await fetch("https://vendly-yqrt.onrender.com/cart", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
