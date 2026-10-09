@@ -10,7 +10,7 @@ function Signup() {
   const handleSignup = async (event) => {
     event.preventDefault();
 
-    const response = await fetch("https://vendly-yqrt.onrender.com/", {
+    const response = await fetch("https://vendly-yqrt.onrender.com/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
