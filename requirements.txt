@@ -8,3 +8,4 @@ redis
 pydantic-settings
 email-validator
 python-dotenv
+psycopg[binary]
