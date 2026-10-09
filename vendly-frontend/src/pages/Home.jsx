@@ -5,7 +5,7 @@ function Home() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("https://vendly-yqrt.onrender.com/products/")
+    fetch("https://vendly-yqrt.onrender.com/products")
       .then((response) => response.json())
       .then((data) => setProducts(data))
       .catch((error) => console.log(error));
