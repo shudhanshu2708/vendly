@@ -11,7 +11,7 @@ function Login() {
   const handleLogin = async (event) => {
     event.preventDefault();
 
-    const response = await fetch("https://vendly-yqrt.onrender.com/", {
+    const response = await fetch("https://vendly-yqrt.onrender.com/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
