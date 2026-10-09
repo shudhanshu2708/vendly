@@ -1,7 +1,9 @@
 from app.database import SessionLocal
-from app.models.product import Product
 from app.models.category import Category
-
+from app.models.product import Product
+from app.models.user import User
+from app.models.cart import CartItem
+from app.models.order import Order
 
 products = [
     {
@@ -42,20 +44,34 @@ products = [
     },
 ]
 
-
 db = SessionLocal()
 
 try:
-    for product_data in products:
-        product = Product(**product_data)
-        db.add(product)
+    added = 0
+    skipped = 0
+
+    for data in products:
+        existing = (
+            db.query(Product)
+            .filter(Product.name == data["name"])
+            .first()
+        )
+
+        if existing:
+            skipped += 1
+            continue
+
+        db.add(Product(**data))
+        added += 1
 
     db.commit()
-    print("Products added successfully!")
+    print(f"Added: {added}, Already existed: {skipped}")
 
 except Exception as error:
     db.rollback()
     print("Error:", error)
+    raise
 
 finally:
     db.close()
+

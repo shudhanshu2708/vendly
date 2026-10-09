@@ -1,4 +1,7 @@
+
 import { useEffect, useState } from "react";
+
+const API = "https://vendly-yqrt.onrender.com";
 
 function AdminDashboard() {
   const [products, setProducts] = useState([]);
@@ -8,27 +11,45 @@ function AdminDashboard() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("access_token");
 
   const fetchProducts = async () => {
-    const response = await fetch("https://vendly-yqrt.onrender.com/products/");
-    const data = await response.json();
-    setProducts(data);
+    try {
+      const response = await fetch(API + "/products/");
+      const data = await response.json();
+
+      if (response.ok) {
+        setProducts(Array.isArray(data) ? data : []);
+      } else {
+        console.error("Failed to fetch products:", data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
   };
 
   const fetchOrders = async () => {
-    const response = await fetch(
-      "https://vendly-yqrt.onrender.com/orders/admin/all",
-      {
+    try {
+      const response = await fetch(API + "/orders/admin/all", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: "Bearer " + token,
         },
-      }
-    );
+      });
 
-    const data = await response.json();
-    setOrders(data);
+      const data = await response.json();
+
+      if (response.ok) {
+        setOrders(Array.isArray(data) ? data : []);
+      } else {
+        console.error("Failed to fetch orders:", data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
+    }
   };
 
   useEffect(() => {
@@ -38,75 +59,105 @@ function AdminDashboard() {
 
   const addProduct = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
-    const response = await fetch("https://vendly-yqrt.onrender.com/products/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name,
-        description,
-        price: Number(price),
-        stock: Number(stock),
-      }),
-    });
+    try {
+      const response = await fetch(API + "/products/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          description: description.trim() || null,
+          price: Number(price),
+          stock: Number(stock),
+          image_url: imageUrl.trim() || null,
+        }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      alert("Product added!");
+      if (response.ok) {
+        alert("Product added successfully!");
 
-      setName("");
-      setDescription("");
-      setPrice("");
-      setStock("");
+        setName("");
+        setDescription("");
+        setPrice("");
+        setStock("");
+        setImageUrl("");
 
-      fetchProducts();
-    } else {
-      alert(data.detail || "Failed to add product");
+        await fetchProducts();
+      } else {
+        alert(
+          typeof data.detail === "string"
+            ? data.detail
+            : "Failed to add product. Check the entered details."
+        );
+      }
+    } catch (error) {
+      console.error("Add product error:", error);
+      alert("Could not connect to the server.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const deleteProduct = async (productId) => {
-    const response = await fetch(
-      `https://vendly-yqrt.onrender.com/products/${productId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    if (!window.confirm("Deactivate this product?")) {
+      return;
+    }
 
-    if (response.ok) {
-      alert("Product deactivated!");
-      fetchProducts();
+    try {
+      const response = await fetch(
+        API + "/products/" + productId,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        alert("Product deactivated!");
+        await fetchProducts();
+      } else {
+        const data = await response.json();
+        alert(data.detail || "Failed to deactivate product.");
+      }
+    } catch (error) {
+      console.error("Deactivate product error:", error);
+      alert("Could not connect to the server.");
     }
   };
 
   const updateOrderStatus = async (orderId, status) => {
-    const response = await fetch(
-      `https://vendly-yqrt.onrender.com/orders/admin/${orderId}/status`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          status: status,
-        }),
-      }
-    );
+    try {
+      const response = await fetch(
+        API + "/orders/admin/" + orderId + "/status",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({ status: status }),
+        }
+      );
 
-    if (response.ok) {
-      alert("Order status updated!");
-      fetchOrders();
-    } else {
       const data = await response.json();
-      alert(data.detail || "Failed to update order");
+
+      if (response.ok) {
+        alert("Order status updated!");
+        await fetchOrders();
+      } else {
+        alert(data.detail || "Failed to update order.");
+      }
+    } catch (error) {
+      console.error("Update order error:", error);
+      alert("Could not connect to the server.");
     }
   };
 
@@ -127,43 +178,95 @@ function AdminDashboard() {
 
         <input
           type="text"
-          placeholder="Description"
+          placeholder="Product description"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
         />
 
         <input
           type="number"
-          placeholder="Price"
+          placeholder="Price (INR)"
           value={price}
           onChange={(event) => setPrice(event.target.value)}
+          min="0.01"
+          step="0.01"
           required
         />
 
         <input
           type="number"
-          placeholder="Stock"
+          placeholder="Stock quantity"
           value={stock}
           onChange={(event) => setStock(event.target.value)}
+          min="0"
+          step="1"
           required
         />
 
-        <button type="submit">Add Product</button>
+        <input
+          type="url"
+          placeholder="Product image URL (https://...)"
+          value={imageUrl}
+          onChange={(event) => setImageUrl(event.target.value)}
+        />
+
+        {imageUrl.trim() !== "" && (
+          <div>
+            <p>Image preview</p>
+            <img
+              src={imageUrl}
+              alt="Product preview"
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
+              onLoad={(event) => {
+                event.currentTarget.style.display = "block";
+              }}
+              style={{
+                width: "150px",
+                height: "150px",
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
+            />
+          </div>
+        )}
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Adding Product..." : "Add Product"}
+        </button>
       </form>
 
-      <h2>Products</h2>
+      <h2>Products ({products.length})</h2>
 
-      {products.map((product) => (
-        <div className="admin-card" key={product.id}>
-          <h3>{product.name}</h3>
-          <p>₹{product.price}</p>
-          <p>Stock: {product.stock}</p>
+      <div className="admin-products">
+        {products.map((product) => (
+          <div className="admin-card" key={product.id}>
+            {product.image_url && (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                loading="lazy"
+                style={{
+                  width: "150px",
+                  height: "150px",
+                  objectFit: "contain",
+                  borderRadius: "8px",
+                }}
+              />
+            )}
 
-          <button onClick={() => deleteProduct(product.id)}>
-            Deactivate
-          </button>
-        </div>
-      ))}
+            <h3>{product.name}</h3>
+            <p>{product.description}</p>
+            <p>Price: ₹{product.price}</p>
+            <p>Stock: {product.stock}</p>
+
+            <button onClick={() => deleteProduct(product.id)}>
+              Deactivate
+            </button>
+          </div>
+        ))}
+      </div>
 
       <h2>Customer Orders</h2>
 
@@ -180,8 +283,13 @@ function AdminDashboard() {
               Current status: <strong>{order.status}</strong>
             </p>
 
+            <label htmlFor={"order-status-" + order.id}>
+              Update status:
+            </label>
+
             <select
-              defaultValue={order.status}
+              id={"order-status-" + order.id}
+              value={order.status}
               onChange={(event) =>
                 updateOrderStatus(order.id, event.target.value)
               }

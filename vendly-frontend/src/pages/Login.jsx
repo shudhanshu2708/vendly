@@ -1,68 +1,67 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+const API_URL = "https://vendly-yqrt.onrender.com";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginType, setLoginType] = useState("customer");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
-    const response = await fetch("https://vendly-yqrt.onrender.com/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      alert(data.detail || "Login failed");
-      return;
-    }
+      if (!response.ok) {
+        alert(data.detail || "Login failed");
+        return;
+      }
 
-    localStorage.setItem("access_token", data.access_token);
-    localStorage.setItem("refresh_token", data.refresh_token);
-
-    // Check the user's actual role
-    const userResponse = await fetch(
-      "https://vendly-yqrt.onrender.com/auth/me",
-      {
+      const userResponse = await fetch(`${API_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${data.access_token}`,
         },
+      });
+
+      if (!userResponse.ok) {
+        alert("Could not verify your account. Please log in again.");
+        return;
       }
-    );
 
-    const user = await userResponse.json();
+      const user = await userResponse.json();
 
-    // Make sure selected login type matches actual role
-    if (loginType === "admin" && user.role !== "admin") {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
+      if (loginType === "admin" && user.role !== "admin") {
+        alert("This account is not an admin account.");
+        return;
+      }
 
-      alert("This account is not an admin account.");
-      return;
+      if (loginType === "customer" && user.role === "admin") {
+        alert("Please select Admin Login for this account.");
+        return;
+      }
+
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("refresh_token", data.refresh_token);
+
+      navigate(user.role === "admin" ? "/admin" : "/");
+    } catch (error) {
+      alert("Unable to connect to the server. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    if (loginType === "customer" && user.role === "admin") {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-
-      alert("Please use Admin Login for this account.");
-      return;
-    }
-
-    navigate("/");
-    window.location.reload();
   };
 
   return (
@@ -104,12 +103,19 @@ function Login() {
           required
         />
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : `Login as ${loginType}`}
+        </button>
       </form>
 
       <p>
         Don't have an account?{" "}
-        <Link to="/signup">Create an account</Link>
+        <Link
+          to="/signup"
+          style={{ color: "inherit", textDecoration: "none" }}
+        >
+          Create an account
+        </Link>
       </p>
     </div>
   );
