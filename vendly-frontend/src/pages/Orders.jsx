@@ -7,7 +7,7 @@ function Orders() {
     const fetchOrders = async () => {
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch("http://127.0.0.1:8000/orders/", {
+      const response = await fetch("https://vendly-yqrt.onrender.com/orders/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
