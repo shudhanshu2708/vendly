@@ -7,11 +7,7 @@ function Orders() {
     const fetchOrders = async () => {
       const token = localStorage.getItem("access_token");
 
-<<<<<<< HEAD
       const response = await fetch("https://vendly-yqrt.onrender.com/orders", {
-=======
-      const response = await fetch("https://vendly-yqrt.onrender.com/orders/", {
->>>>>>> fefc5af (Fix production APIs URL)
         headers: {
           Authorization: `Bearer ${token}`,
         },

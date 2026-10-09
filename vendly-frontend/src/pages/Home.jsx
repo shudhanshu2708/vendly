@@ -5,11 +5,7 @@ function Home() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-<<<<<<< HEAD
     fetch("https://vendly-yqrt.onrender.com/products")
-=======
-    fetch("https://vendly-yqrt.onrender.com/products/")
->>>>>>> fefc5af (Fix production APIs URL)
       .then((response) => response.json())
       .then((data) => setProducts(data))
       .catch((error) => console.log(error));
