@@ -6,7 +6,7 @@ function Cart() {
   const fetchCart = async () => {
     const token = localStorage.getItem("access_token");
 
-    const response = await fetch("https://vendly-yqrt.onrender.com/cart", {
+    const response = await fetch("http://127.0.0.1:8000/cart/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -23,7 +23,7 @@ function Cart() {
   const removeItem = async (itemId) => {
     const token = localStorage.getItem("access_token");
 
-    await fetch(`http://127.0.0.1:8000/cart/${itemId}`, {
+    await fetch(`https://vendly-yqrt.onrender.com/cart/${itemId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ function Cart() {
     const token = localStorage.getItem("access_token");
 
     const response = await fetch(
-      "http://127.0.0.1:8000/orders/checkout",
+      "https://vendly-yqrt.onrender.com/orders/checkout",
       {
         method: "POST",
         headers: {

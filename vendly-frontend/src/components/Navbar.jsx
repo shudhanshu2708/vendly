@@ -13,7 +13,7 @@ function Navbar() {
       return;
     }
 
-    fetch("http://127.0.0.1:8000/auth/me", {
+    fetch("https://vendly-yqrt.onrender.com/auth/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

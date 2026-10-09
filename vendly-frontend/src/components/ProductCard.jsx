@@ -2,7 +2,7 @@ function ProductCard({ product }) {
   const addToCart = async () => {
     const token = localStorage.getItem("access_token");
 
-    const response = await fetch("http://127.0.0.1:8000/cart/", {
+    const response = await fetch("https://vendly-yqrt.onrender.com/cart/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

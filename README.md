@@ -81,7 +81,35 @@ uvicorn app.main:app --reload
 
 The API will be available at `http://localhost:8000`, with interactive docs at `http://localhost:8000/docs`.
 
+<<<<<<< HEAD
 ### Frontend
+=======
+### 3. Start Postgres and Redis (Docker)
+```bash
+docker run --name vendly-postgres -e POSTGRES_USER=vendly_user -e POSTGRES_PASSWORD=vendly_pass -e POSTGRES_DB=vendly -p 5433:5432 -d postgres
+
+docker run --name vendly-redis -p 6380:6379 -d redis
+```
+
+### 4. Configure environment variables
+Copy `.env.example` to `.env` and fill in real values:
+```
+DATABASE_URL=postgresql://vendly_user:vendly_pass@localhost:5433/vendly
+JWT_SECRET_KEY=your-secret-key-here
+REDIS_URL=redis://localhost:6380/0
+```
+
+### 5. Run the server
+```bash
+python -m uvicorn app.main:app --reload
+```
+
+API docs available at: `https://vendly-yqrt.onrender.com/docs`
+
+### Alternative: Docker Compose
+
+A `docker-compose.yml` is included for Postgres + Redis:
+>>>>>>> fefc5af (Fix production APIs URL)
 
 ```bash
 cd vendly-frontend

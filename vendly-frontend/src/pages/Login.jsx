@@ -34,7 +34,7 @@ function Login() {
 
     // Check the user's actual role
     const userResponse = await fetch(
-      "http://127.0.0.1:8000/auth/me",
+      "https://vendly-yqrt.onrender.com/auth/me",
       {
         headers: {
           Authorization: `Bearer ${data.access_token}`,

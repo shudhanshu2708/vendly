@@ -12,14 +12,14 @@ function AdminDashboard() {
   const token = localStorage.getItem("access_token");
 
   const fetchProducts = async () => {
-    const response = await fetch("http://127.0.0.1:8000/products/");
+    const response = await fetch("https://vendly-yqrt.onrender.com/products/");
     const data = await response.json();
     setProducts(data);
   };
 
   const fetchOrders = async () => {
     const response = await fetch(
-      "http://127.0.0.1:8000/orders/admin/all",
+      "https://vendly-yqrt.onrender.com/orders/admin/all",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -39,7 +39,7 @@ function AdminDashboard() {
   const addProduct = async (event) => {
     event.preventDefault();
 
-    const response = await fetch("http://127.0.0.1:8000/products/", {
+    const response = await fetch("https://vendly-yqrt.onrender.com/products/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ function AdminDashboard() {
 
   const deleteProduct = async (productId) => {
     const response = await fetch(
-      `http://127.0.0.1:8000/products/${productId}`,
+      `https://vendly-yqrt.onrender.com/products/${productId}`,
       {
         method: "DELETE",
         headers: {
@@ -88,7 +88,7 @@ function AdminDashboard() {
 
   const updateOrderStatus = async (orderId, status) => {
     const response = await fetch(
-      `http://127.0.0.1:8000/orders/admin/${orderId}/status`,
+      `https://vendly-yqrt.onrender.com/orders/admin/${orderId}/status`,
       {
         method: "PUT",
         headers: {
